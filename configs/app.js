@@ -8,8 +8,11 @@ import helmet from "helmet";
 import { helmetConfiguration } from "./helmet-configuration.js";
 import { requestLimit } from "../middlewares/request-limit.js";
 import usersRoutes from "../src/users/users-routes.js";
+import restaurantsRoutes from "../src/restaurants/restaurants-routes.js";
+import gastronomicEventsRoutes from "../src/gastronomicEvents/gastronomicEvents-routes.js";
+import tablesRoutes from "../src/tables/tables-routes.js";
 
-const BASE_URL = '/bite&go/v1';
+const BASE_URL = '/bite-and-go/v1';
 
 // Rutas
 import { dbConnection } from './db.js';
@@ -26,6 +29,9 @@ const middlewares = (app) => {
 //Integracion de todas las rutas
 const routes = (app) => {
     app.use(`${BASE_URL}/users`, usersRoutes);
+    app.use(`${BASE_URL}/restaurants`, restaurantsRoutes);
+    app.use(`${BASE_URL}/gastronomicEvents`, gastronomicEventsRoutes);
+    app.use(`${BASE_URL}/tables`, tablesRoutes);
 }
 
 // funcion para iniciar el servidor
