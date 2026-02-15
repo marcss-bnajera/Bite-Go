@@ -33,7 +33,7 @@ export const dbConnection = async () => {
             console.log('MongoDB | desconectado de mongoBD');
         });
 
-        await mongoose.connect(process.env.URL_MONGO, {
+        await mongoose.connect(process.env.URL_MONGODB, {
             serverSelectionTimeoutMS: 5000,
             maxPoolSize: 10,
         });

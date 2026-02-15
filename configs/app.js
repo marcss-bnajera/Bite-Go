@@ -7,11 +7,12 @@ import { corsOptions } from "./cors-configuration.js";
 import helmet from "helmet";
 import { helmetConfiguration } from "./helmet-configuration.js";
 import { requestLimit } from "../middlewares/request-limit.js";
+import usersRoutes from "../src/users/users-routes.js";
+
+const BASE_URL = '/bite&go/v1';
 
 // Rutas
 import { dbConnection } from './db.js';
-
-const BASE_URL = '/bite&go/v1';
 
 const middlewares = (app) => {
     app.use(helmet(helmetConfiguration));
@@ -24,7 +25,7 @@ const middlewares = (app) => {
 
 //Integracion de todas las rutas
 const routes = (app) => {
-
+    app.use(`${BASE_URL}/users`, usersRoutes);
 }
 
 // funcion para iniciar el servidor
