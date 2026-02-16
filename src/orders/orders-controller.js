@@ -150,7 +150,7 @@ export const createOrder = async (req, res) => {
 };
 
 /**
- * PUT - Actualizar un pedido (ej: cambiar estado)
+ * PUT - Actualizar un pedido 
  */
 export const updateOrder = async (req, res) => {
     try {
