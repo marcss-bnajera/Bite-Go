@@ -16,6 +16,7 @@ import ordersRoutes from "../src/orders/orders-routes.js";
 import itemsRoutes from "../src/items/items-routes.js";
 import recipesRoutes from "../src/recipes/recipes-routes.js";
 import suppliesInventoryRoutes from "../src/suppliesInventory/suppliesInventory-routes.js";
+import reservationsRoutes from "../src/reservations/reservations-routes.js";
 
 const BASE_URL = '/bite-and-go/v1';
 
@@ -35,6 +36,7 @@ const middlewares = (app) => {
 const routes = (app) => {
     app.use(`${BASE_URL}/users`, usersRoutes);
     app.use(`${BASE_URL}/restaurants`, restaurantsRoutes);
+    app.use(`${BASE_URL}/reservations`, reservationsRoutes);
     app.use(`${BASE_URL}/gastronomicEvents`, gastronomicEventsRoutes);
     app.use(`${BASE_URL}/tables`, tablesRoutes);
     app.use(`${BASE_URL}/products`, productsRoutes);
