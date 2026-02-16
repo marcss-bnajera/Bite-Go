@@ -13,6 +13,8 @@ import gastronomicEventsRoutes from "../src/gastronomicEvents/gastronomicEvents-
 import tablesRoutes from "../src/tables/tables-routes.js";
 import productsRoutes from "../src/products/products-routes.js";
 import ordersRoutes from "../src/orders/orders-routes.js";
+import itemsRoutes from "../src/items/items-routes.js";
+import recipesRoutes from "../src/recipes/recipes-routes.js";
 
 const BASE_URL = '/bite-and-go/v1';
 
@@ -36,6 +38,8 @@ const routes = (app) => {
     app.use(`${BASE_URL}/tables`, tablesRoutes);
     app.use(`${BASE_URL}/products`, productsRoutes);
     app.use(`${BASE_URL}/orders`, ordersRoutes);
+    app.use(`${BASE_URL}/items`, itemsRoutes);
+    app.use(`${BASE_URL}/recipes`, recipesRoutes);
 }
 
 // funcion para iniciar el servidor

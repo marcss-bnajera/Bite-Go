@@ -1,13 +1,14 @@
 import { Schema, model } from 'mongoose';
 import { validateOrderAssignments } from '../../middlewares/order-logic-validators.js';
 
-// ItemPedido
-// Subdocumento para los productos del pedido
+/**
+ * ITEM PEDIDO (Subdocumento)
+ */
 const itemPedidoSchema = new Schema({
     id_producto: {
         type: Schema.Types.ObjectId,
         ref: 'Product',
-        required: true
+        required: [true, 'El ID del producto es obligatorio']
     },
     nombre_historico: {
         type: String,
@@ -15,8 +16,9 @@ const itemPedidoSchema = new Schema({
     },
     cantidad: {
         type: Number,
-        required: true,
-        min: 1
+        required: [true, 'La cantidad es obligatoria'],
+        min: [1, 'La cantidad mínima es 1'],
+        default: 1
     },
     precio_historico: {
         type: Number,
@@ -24,11 +26,16 @@ const itemPedidoSchema = new Schema({
     },
     notas: {
         type: String,
-        trim: true
+        trim: true,
+        default: ""
     }
+}, {
+    _id: true
 });
 
-// Pedido
+/**
+ * PEDIDO 
+ */
 const orderSchema = new Schema({
     id_usuario_cliente: {
         type: Schema.Types.ObjectId,
@@ -51,6 +58,7 @@ const orderSchema = new Schema({
         default: null
     },
     items: [itemPedidoSchema],
+
     total: {
         type: Number,
         required: true,
@@ -82,6 +90,14 @@ const orderSchema = new Schema({
     }
 });
 
-orderSchema.pre('save', validateOrderAssignments);
+orderSchema.index({ id_usuario_cliente: 1, activo: 1 });
+orderSchema.index({ id_restaurante: 1, estado: 1 });
+
+orderSchema.pre('save', function (next) {
+    if (typeof validateOrderAssignments === 'function') {
+        return validateOrderAssignments.call(this, next);
+    }
+    next();
+});
 
 export default model('Order', orderSchema);

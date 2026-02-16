@@ -1,4 +1,3 @@
-
 import Product from "./products-model.js";
 
 /**
@@ -6,14 +5,19 @@ import Product from "./products-model.js";
  */
 export const getProducts = async (req, res) => {
     try {
-        const { page = 1, limit = 10 } = req.query;
+        const { page = 1, limit = 10, search } = req.query;
+
         const query = { activo: true };
+        if (search) {
+            query.nombre = { $regex: search, $options: "i" };
+        }
 
         const [products, total] = await Promise.all([
             Product.find(query)
                 .skip((page - 1) * limit)
                 .limit(parseInt(limit))
-                .sort({ createdAt: -1 }),
+                .sort({ createdAt: -1 })
+                .populate('id_restaurante', 'nombre categoria_gastronomica'),
             Product.countDocuments(query)
         ]);
 
@@ -25,42 +29,9 @@ export const getProducts = async (req, res) => {
             products
         });
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Error al obtener productos",
-            error: error.message
-        });
+        res.status(500).json({ success: false, message: "Error al obtener productos", error: error.message });
     }
 };
-
-/**
- * GET - Obtener producto por ID
- */
-export const getProductById = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const product = await Product.findById(id);
-
-        if (!product || !product.activo) {
-            return res.status(404).json({
-                success: false,
-                message: "Producto no encontrado"
-            });
-        }
-
-        res.status(200).json({
-            success: true,
-            product
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Error al obtener producto",
-            error: error.message
-        });
-    }
-};
-
 /**
  * GET - Obtener productos por restaurante
  */
@@ -86,11 +57,25 @@ export const getProductsByRestaurant = async (req, res) => {
             products
         });
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Error al obtener productos del restaurante",
-            error: error.message
-        });
+        res.status(500).json({ success: false, message: "Error al obtener productos", error: error.message });
+    }
+};
+/**
+ * GET - Obtener un solo producto por ID
+ */
+export const getProductById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const product = await Product.findOne({ _id: id, activo: true })
+            .populate('id_restaurante', 'nombre direccion');
+
+        if (!product) {
+            return res.status(404).json({ success: false, message: "Producto no encontrado" });
+        }
+
+        res.status(200).json({ success: true, product });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Error en el servidor", error: error.message });
     }
 };
 
@@ -108,74 +93,48 @@ export const createProduct = async (req, res) => {
             product
         });
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Error al crear producto",
-            error: error.message
-        });
+        res.status(400).json({ success: false, message: "Datos de producto inválidos", error: error.message });
     }
 };
 
 /**
- * PUT - Actualizar un producto
+ * PUT - Actualizar un producto 
  */
 export const updateProduct = async (req, res) => {
     try {
         const { id } = req.params;
-        const data = req.body;
+        const { receta, activo, id_restaurante, ...data } = req.body;
 
-        const product = await Product.findByIdAndUpdate(id, data, { new: true });
+        const product = await Product.findByIdAndUpdate(
+            id,
+            data,
+            { new: true, runValidators: true }
+        );
 
-        if (!product) {
-            return res.status(404).json({
-                success: false,
-                message: "Producto no encontrado"
-            });
-        }
+        if (!product) return res.status(404).json({ success: false, message: "Producto no encontrado" });
 
         res.status(200).json({
             success: true,
-            message: "Producto actualizado",
+            message: "Información del producto actualizada",
             product
         });
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Error al actualizar producto",
-            error: error.message
-        });
+        res.status(500).json({ success: false, message: "Error al actualizar", error: error.message });
     }
 };
 
 /**
- * DELETE - Desactivar un producto
+ * DELETE - Desactivar producto
  */
 export const deleteProduct = async (req, res) => {
     try {
         const { id } = req.params;
+        const product = await Product.findByIdAndUpdate(id, { activo: false }, { new: true });
 
-        const product = await Product.findByIdAndUpdate(
-            id,
-            { activo: false },
-            { new: true }
-        );
+        if (!product) return res.status(404).json({ success: false, message: "Producto no encontrado" });
 
-        if (!product) {
-            return res.status(404).json({
-                success: false,
-                message: "Producto no encontrado"
-            });
-        }
-
-        res.status(200).json({
-            success: true,
-            message: "Producto desactivado correctamente"
-        });
+        res.status(200).json({ success: true, message: "Producto dado de baja exitosamente" });
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Error al eliminar producto",
-            error: error.message
-        });
+        res.status(500).json({ success: false, message: "Error al eliminar", error: error.message });
     }
 };

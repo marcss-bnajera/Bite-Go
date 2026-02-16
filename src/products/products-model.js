@@ -1,20 +1,20 @@
-
 import { Schema, model } from 'mongoose';
 
-// Receta
-// Subdocumento para los ingredientes/insumos del producto
 const recetaSchema = new Schema({
     nombre_insumo: {
         type: String,
-        required: true
+        required: [true, 'El nombre del insumo es obligatorio'],
+        trim: true
     },
     cantidad_requerida: {
         type: Number,
-        required: true
+        required: [true, 'La cantidad es obligatoria'],
+        min: [0, 'La cantidad no puede ser negativa']
     }
+}, {
+    _id: true
 });
 
-// Producto
 const productSchema = new Schema({
     id_restaurante: {
         type: Schema.Types.ObjectId,
@@ -63,5 +63,7 @@ const productSchema = new Schema({
         }
     }
 });
+
+productSchema.index({ id_restaurante: 1, activo: 1 });
 
 export default model('Product', productSchema);
